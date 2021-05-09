@@ -8,6 +8,7 @@ import javafx.application.Application;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.stage.Stage;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -19,6 +20,7 @@ public class Main extends Application {
 	@Override
 	public void start(Stage primaryStage) {
 		try {
+
 			// Declare panes
 			BorderPane pane = new BorderPane();
 			BorderPane topPane = new BorderPane();
@@ -46,7 +48,7 @@ public class Main extends Application {
 			topPane.setCenter(score);
 			topPane.setRight(highScore);
 
-			// Declare the box images
+			// Declare the urls and box images
 			Image imageWall = new Image("boxes/Wall Type Box.png");
 			Image imageEmpty = new Image("boxes/Empty Type Box.png");
 			Image imageMirror = new Image("boxes/Mirror Type Box.png");
@@ -89,6 +91,69 @@ public class Main extends Application {
 				}
 			}
 
+			// After creating the game board, set the mouse click event
+			centerPane.setOnMouseClicked(e -> {
+				for (Node box : centerPane.getChildren()) {
+					// Control the box for specific properties
+					boolean instanceCheck = box instanceof ImageView;
+					boolean areaCheck = box.getBoundsInParent().contains(e.getX(), e.getY());
+					boolean typeCheck = ((ImageView) box).getImage().getUrl().contains("Mirror")
+							|| ((ImageView) box).getImage().getUrl().contains("Wood");
+
+					// If the control is successful, then take the coordinates of the clicked box
+					if (instanceCheck && areaCheck && typeCheck) {
+						int destroyedBoxCount = 0;
+						int i = GridPane.getRowIndex(box);
+						int j = GridPane.getColumnIndex(box);
+
+						// Destroy the clicked box and its surrounding boxes
+						for (Node aroundBox : centerPane.getChildren()) {
+							// Get coordinates and type of the aroundBox
+							int rowIndex = GridPane.getRowIndex(aroundBox);
+							int colIndex = GridPane.getColumnIndex(aroundBox);
+							String aroundBoxType = getBoxType(aroundBox);
+
+							// Validate the location of the aroundBox
+							boolean mainBoxCheck = rowIndex == i && colIndex == j;
+							boolean topBoxCheck = rowIndex == i - 1 && colIndex == j;
+							boolean rightBoxCheck = rowIndex == i && colIndex == j + 1;
+							boolean bottomBoxCheck = rowIndex == i + 1 && colIndex == j;
+							boolean leftBoxCheck = rowIndex == i && colIndex == j - 1;
+
+							boolean locationControl = mainBoxCheck || topBoxCheck || rightBoxCheck || bottomBoxCheck
+									|| leftBoxCheck;
+							boolean typeControl = aroundBoxType == "Mirror" || aroundBoxType == "Wood";
+
+							// If the box is in one of these places and its type is suitable for destroy
+							if (locationControl && typeControl) {
+								if (aroundBoxType == "Mirror")
+									((ImageView) aroundBox).setImage(imageEmpty);
+								else if (aroundBoxType == "Wood")
+									((ImageView) aroundBox).setImage(imageMirror);
+								destroyedBoxCount++;
+							}
+						}
+
+						// Get the earned point amount and add it to the score label
+						int earnedPoint = getEarnedPoint(destroyedBoxCount);
+						score.setText("" + (Integer.valueOf(score.getText()) + earnedPoint));
+
+						// If the current score is bigger than the high score, set the high score
+						int scoreValue = Integer.valueOf(score.getText());
+						int highScoreValue = Integer.valueOf(highScore.getText().substring(12));
+
+						if (scoreValue > highScoreValue)
+							highScore.setText("High Score: " + score.getText());
+
+						// TODO
+						// Display, information about the location of the clicked box, neighbor boxes,
+						// and obtained score value.
+
+						break;
+					}
+				}
+			});
+
 			// Add bottom labels to the bottomPane
 			bottomPane.setLeft(action);
 			bottomPane.setRight(nextLevel);
@@ -107,17 +172,61 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
-		} catch (Exception e) {
+		} catch (
+
+		Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	// This method takes an image and convert it to ImageView with 30x30 sizes
+	// Takes an image and convert it to ImageView with 30x30 sizes
 	public ImageView setupImage(Image image) {
 		ImageView imageView = new ImageView(image);
 		imageView.setFitHeight(30);
 		imageView.setFitWidth(30);
 		return imageView;
+	}
+
+	// Gives the type of the box
+	public String getBoxType(Node box) {
+		String url = ((ImageView) box).getImage().getUrl();
+		if (url.contains("Wall"))
+			return "Wall";
+		else if (url.contains("Empty"))
+			return "Empty";
+		else if (url.contains("Mirror"))
+			return "Mirror";
+		else if (url.contains("Wood"))
+			return "Wood";
+		else
+			return "";
+	}
+
+	// Returns the amount of points earned based on the destroyed box count
+	public int getEarnedPoint(int destroyedBoxCount) {
+		int earnedPoint;
+
+		switch (destroyedBoxCount) {
+		case 1:
+			earnedPoint = -3;
+			break;
+		case 2:
+			earnedPoint = -1;
+			break;
+		case 3:
+			earnedPoint = 1;
+			break;
+		case 4:
+			earnedPoint = 2;
+			break;
+		case 5:
+			earnedPoint = 4;
+			break;
+		default:
+			earnedPoint = 0;
+		}
+
+		return earnedPoint;
 	}
 
 	public static void main(String[] args) {
