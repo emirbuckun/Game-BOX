@@ -1,5 +1,5 @@
 # Game-BOX
-A simple game created using java!
+A simple game created using javaFX!
 
 Simple scenario:
 
