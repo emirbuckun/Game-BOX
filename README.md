@@ -18,9 +18,7 @@
 <hr/>
 <h4>PROBLEM DEFINITION</h4>
 
-Briefly describe the problem of the game in 1-2 paragraphs.
-
-// TODO
+Firstly, we aimed to develop a simple board game named “Game Box”. In this game, the game board consists of 10x10 boxes and our main goal is to get the maximum score by destroying the boxes with minimum mouse clicks. Note that neighboring boxes to the box you click will also be affected. There are different types of boxes and these boxes placed separately on each level. When you complete the current level, you can move on the next level. 
 
 <br/><h4>IMPLEMENTATION DETAILS</h4>
 
