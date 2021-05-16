@@ -34,7 +34,7 @@ iii) what are the additional functionalities of your project added by your team?
 
 // TODO
 
-<br/><h4>TEST CASES</h4><br/>
+<br/><h4>TEST CASES</h4>
 
 This section should contain the results of your testing phase. You should provide the screenshots of your project execution for the given test cases and add explanations about them. Filling this part only with screenshots is not a feasible solution.
 
