@@ -95,18 +95,25 @@ public class Main extends Application {
 			centerPane.setOnMouseClicked(e -> {
 				for (Node box : centerPane.getChildren()) {
 					// Control the box for specific properties
+					String boxType = getBoxType(box);
 					boolean instanceCheck = box instanceof ImageView;
 					boolean areaCheck = box.getBoundsInParent().contains(e.getX(), e.getY());
-					boolean typeCheck = ((ImageView) box).getImage().getUrl().contains("Mirror")
-							|| ((ImageView) box).getImage().getUrl().contains("Wood");
+					boolean typeCheck = boxType == "Mirror" || boxType == "Wood";
 
 					// If the control is successful, then take the coordinates of the clicked box
 					if (instanceCheck && areaCheck && typeCheck) {
-						int destroyedBoxCount = 0;
 						int i = GridPane.getRowIndex(box);
 						int j = GridPane.getColumnIndex(box);
+						String actionText = "Box: " + i + "-" + j;
 
-						// Destroy the clicked box and its surrounding boxes
+						// Destroy the clicked box
+						if (boxType == "Mirror")
+							((ImageView) box).setImage(imageEmpty);
+						else if (boxType == "Wood")
+							((ImageView) box).setImage(imageMirror);
+						int destroyedBoxCount = 1;
+
+						// Destroy the neighboring boxes
 						for (Node aroundBox : centerPane.getChildren()) {
 							// Get coordinates and type of the aroundBox
 							int rowIndex = GridPane.getRowIndex(aroundBox);
@@ -114,14 +121,12 @@ public class Main extends Application {
 							String aroundBoxType = getBoxType(aroundBox);
 
 							// Validate the location of the aroundBox
-							boolean mainBoxCheck = rowIndex == i && colIndex == j;
 							boolean topBoxCheck = rowIndex == i - 1 && colIndex == j;
 							boolean rightBoxCheck = rowIndex == i && colIndex == j + 1;
 							boolean bottomBoxCheck = rowIndex == i + 1 && colIndex == j;
 							boolean leftBoxCheck = rowIndex == i && colIndex == j - 1;
 
-							boolean locationControl = mainBoxCheck || topBoxCheck || rightBoxCheck || bottomBoxCheck
-									|| leftBoxCheck;
+							boolean locationControl = topBoxCheck || rightBoxCheck || bottomBoxCheck || leftBoxCheck;
 							boolean typeControl = aroundBoxType == "Mirror" || aroundBoxType == "Wood";
 
 							// If the box is in one of these places and its type is suitable for destroy
@@ -130,6 +135,8 @@ public class Main extends Application {
 									((ImageView) aroundBox).setImage(imageEmpty);
 								else if (aroundBoxType == "Wood")
 									((ImageView) aroundBox).setImage(imageMirror);
+
+								actionText += " - " + "Hit: " + rowIndex + "," + colIndex;
 								destroyedBoxCount++;
 							}
 						}
@@ -145,9 +152,12 @@ public class Main extends Application {
 						if (scoreValue > highScoreValue)
 							highScore.setText("High Score: " + score.getText());
 
-						// TODO
-						// Display, information about the location of the clicked box, neighbor boxes,
-						// and obtained score value.
+						if (earnedPoint <= 0)
+							actionText += " (" + earnedPoint + " points)";
+						else if (earnedPoint > 0)
+							actionText += " (+" + earnedPoint + " points)";
+
+						action.setText("" + actionText);
 
 						break;
 					}
@@ -164,7 +174,7 @@ public class Main extends Application {
 			pane.setBottom(bottomPane);
 
 			// Set the scene
-			Scene scene = new Scene(pane, 300, 350);
+			Scene scene = new Scene(pane, 400, 450);
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
 			// Set the stage
@@ -182,8 +192,8 @@ public class Main extends Application {
 	// Takes an image and convert it to ImageView with 30x30 sizes
 	public ImageView setupImage(Image image) {
 		ImageView imageView = new ImageView(image);
-		imageView.setFitHeight(30);
-		imageView.setFitWidth(30);
+		imageView.setFitHeight(39);
+		imageView.setFitWidth(39);
 		return imageView;
 	}
 
