@@ -1,3 +1,10 @@
+/* This program runs the game called 'game box' 
+ * and allows it to be played with the mouse.
+ *
+ * Student Name - ID:
+ * Emir BÜÇKÜN - 150119024
+ * Haydar Taha TUNÇ - 150119745 */
+
 package application;
 
 import java.io.File;
@@ -104,7 +111,6 @@ public class Main extends Application {
 					if (instanceCheck && areaCheck && typeCheck) {
 						int i = GridPane.getRowIndex(box);
 						int j = GridPane.getColumnIndex(box);
-						String actionText = "Box: " + i + "-" + j;
 
 						// Destroy the clicked box
 						if (boxType == "Mirror")
@@ -112,6 +118,9 @@ public class Main extends Application {
 						else if (boxType == "Wood")
 							((ImageView) box).setImage(imageMirror);
 						int destroyedBoxCount = 1;
+
+						// Set the action text for clicked box
+						String actionText = "Box: " + i + "-" + j;
 
 						// Destroy the neighboring boxes
 						for (Node aroundBox : centerPane.getChildren()) {
@@ -135,9 +144,10 @@ public class Main extends Application {
 									((ImageView) aroundBox).setImage(imageEmpty);
 								else if (aroundBoxType == "Wood")
 									((ImageView) aroundBox).setImage(imageMirror);
-
-								actionText += " - " + "Hit: " + rowIndex + "," + colIndex;
 								destroyedBoxCount++;
+
+								// Set the action text for destroyed neighboring box
+								actionText += " - " + "Hit: " + rowIndex + "," + colIndex;
 							}
 						}
 
@@ -152,11 +162,13 @@ public class Main extends Application {
 						if (scoreValue > highScoreValue)
 							highScore.setText("High Score: " + score.getText());
 
+						// Set the action text according to the amount of points earned
 						if (earnedPoint <= 0)
 							actionText += " (" + earnedPoint + " points)";
 						else if (earnedPoint > 0)
 							actionText += " (+" + earnedPoint + " points)";
 
+						// Show the action text after click event
 						action.setText("" + actionText);
 
 						break;
@@ -182,14 +194,12 @@ public class Main extends Application {
 			primaryStage.setScene(scene);
 			primaryStage.show();
 
-		} catch (
-
-		Exception e) {
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	// Takes an image and convert it to ImageView with 30x30 sizes
+	// Takes an image and converts it to ImageView with 39x39 sizes
 	public ImageView setupImage(Image image) {
 		ImageView imageView = new ImageView(image);
 		imageView.setFitHeight(39);
