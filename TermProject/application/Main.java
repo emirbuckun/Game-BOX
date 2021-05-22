@@ -1,4 +1,4 @@
-/* This program runs the game called 'game box' 
+/* This program runs the game called 'Game Box' 
  * and allows it to be played with the mouse.
  *
  * Student Name - ID:
