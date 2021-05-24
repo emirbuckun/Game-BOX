@@ -6,12 +6,10 @@ Mirror,1,4
 Mirror,2,4
 Mirror,3,4
 Mirror,4,4
-Mirror,5,4
 Mirror,6,4
 Mirror,7,4
 Mirror,2,5
 Mirror,3,5
-Mirror,4,5
 Mirror,5,5
 Mirror,6,5
 Mirror,7,5

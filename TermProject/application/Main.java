@@ -8,6 +8,7 @@
 package application;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -20,8 +21,17 @@ import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.input.KeyCode;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.paint.CycleMethod;
+import javafx.scene.paint.LinearGradient;
+import javafx.scene.paint.Stop;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
+import javafx.animation.FadeTransition;
 
 public class Main extends Application {
 	@Override
@@ -29,23 +39,62 @@ public class Main extends Application {
 		try {
 
 			// Declare panes
-			BorderPane pane = new BorderPane();
+			BorderPane menuPane = new BorderPane();
+			BorderPane gamePane = new BorderPane();
 			BorderPane topPane = new BorderPane();
 			GridPane centerPane = new GridPane();
 			BorderPane bottomPane = new BorderPane();
 
-			// Set styles
+			// Set pane styles
 			topPane.setPadding(new Insets(1, 5, 1, 5));
 			centerPane.setStyle("-fx-background-color: gray;");
 			centerPane.setAlignment(Pos.CENTER);
 			bottomPane.setPadding(new Insets(1, 5, 1, 5));
+			menuPane.setStyle("-fx-background-image: url('images/menu_background.jpg'); -fx-background-size: 400 450;");
 
-			// Create top labels
+			// Create menu labels
+			Label gameBox = new Label("GAME BOX");
+			Label newGame = new Label("New Game");
+			Label resumeGame = new Label("Resume Game");
+			Label menuHighScores = new Label("High Scores");
+			Label infoText = new Label("(You can click the 'M' button to return the menu)");
+
+			// Set menu label styles
+			Font menuLabelFont = Font.font("Times New Roman", FontWeight.BOLD, 20);
+			Stop[] stops = new Stop[] { new Stop(0, Color.rgb(251, 118, 237, 1)),
+					new Stop(1, Color.rgb(79, 191, 230, 1)) };
+			LinearGradient linear = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
+
+			gameBox.setFont(Font.font("Times New Roman", FontWeight.BOLD, 30));
+			newGame.setFont(menuLabelFont);
+			resumeGame.setFont(menuLabelFont);
+			menuHighScores.setFont(menuLabelFont);
+			gameBox.setTextFill(linear);
+			newGame.setTextFill(linear);
+			resumeGame.setTextFill(linear);
+			menuHighScores.setTextFill(linear);
+			infoText.setTextFill(linear);
+
+			// Add the menu labels to a centered vertical box
+			VBox menuLabelBox = new VBox();
+			VBox clickableLabelBox = new VBox();
+			menuLabelBox.setAlignment(Pos.CENTER);
+			menuLabelBox.setSpacing(40);
+			clickableLabelBox.setAlignment(Pos.CENTER);
+			clickableLabelBox.setSpacing(20);
+
+			clickableLabelBox.getChildren().addAll(newGame, resumeGame, menuHighScores);
+			menuLabelBox.getChildren().addAll(gameBox, clickableLabelBox, infoText);
+
+			// Add menu labels to the menu pane
+			menuPane.setCenter(menuLabelBox);
+
+			// Declare top labels
 			Label level = new Label("Level #1");
 			Label score = new Label("0");
 			Label highScore = new Label("High Score: 0");
 
-			// Create bottom labels
+			// Declare bottom labels
 			Label action = new Label("---Text---");
 			Label nextLevel = new Label("Next Level >>");
 			nextLevel.setVisible(false);
@@ -55,50 +104,100 @@ public class Main extends Application {
 			topPane.setCenter(score);
 			topPane.setRight(highScore);
 
-			// Declare the urls and box images
+			// Declare the box images
 			Image imageWall = new Image("boxes/Wall Type Box.png");
 			Image imageEmpty = new Image("boxes/Empty Type Box.png");
 			Image imageMirror = new Image("boxes/Mirror Type Box.png");
 			Image imageWood = new Image("boxes/Wood Type Box.png");
 
-			// Create a File instance
-			File file = new File("levels/level1.txt");
+			// Add bottom labels to the bottomPane
+			bottomPane.setLeft(action);
+			bottomPane.setRight(nextLevel);
 
-			// Create a Scanner for the file
-			Scanner input = new Scanner(file);
+			// Set the parts of the main pane
+			gamePane.setTop(topPane);
+			gamePane.setCenter(centerPane);
+			gamePane.setBottom(bottomPane);
 
-			// An ArrayList for already added cells (row, column)
-			ArrayList<String> addedCells = new ArrayList<String>();
+			// Set the scenes
+			Scene menuScene = new Scene(menuPane, 400, 450);
+			menuScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
-			while (input.hasNext()) {
-				// Get the next line -> Get row and column indexes from the line -> Add the
-				// indexes to the arraylist
-				String boxType = input.next();
-				int rowIndex = (int) boxType.charAt(boxType.length() - 3) - '0';
-				int columnIndex = (int) boxType.charAt(boxType.length() - 1) - '0';
-				addedCells.add(rowIndex + "," + columnIndex);
+			Scene gameScene = new Scene(gamePane, 400, 450);
+			menuScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 
-				// Add boxes to centerPane according to the box type
-				if (boxType.substring(0, 4).equals("Wood")) // if it's wood box type
-					centerPane.add(setupImage(imageWood), columnIndex, rowIndex);
-				else if (boxType.substring(0, 5).equals("Empty")) // if it's empty box type
-					centerPane.add(setupImage(imageEmpty), columnIndex, rowIndex);
-				else if (boxType.substring(0, 6).equals("Mirror")) // if it's mirror box type
-					centerPane.add(setupImage(imageMirror), columnIndex, rowIndex);
-			}
+			// Set the stage
+			primaryStage.setTitle("Game BOX");
+			primaryStage.setScene(menuScene);
+			primaryStage.show();
 
-			// Close the Scanner
-			input.close();
+			// Set the mouse click event for resume game label
+			resumeGame.setOnMouseClicked(e -> {
+				if (level.getText() != "Level #1" || score.getText() != "0" || highScore.getText() != "High Score: 0")
+					primaryStage.setScene(gameScene);
+			});
 
-			// Fill the remaining boxes with the wall type box
-			for (int i = 0; i < 10; i++) {
-				for (int j = 0; j < 10; j++) {
-					if (!addedCells.contains(i + "," + j))
-						centerPane.add(setupImage(imageWall), j, i);
+			// Set the key pressed event for 'M' button to return the menu
+			gameScene.setOnKeyPressed(e -> {
+				if (e.getCode() == KeyCode.M)
+					primaryStage.setScene(menuScene);
+			});
+
+			// Mouse click event for 'New Game' label
+			newGame.setOnMouseClicked(e -> {
+				// Edit label infos
+				level.setText("Level #1");
+				score.setText("0");
+				highScore.setText("High Score: 0");
+				action.setText("---Text---");
+				nextLevel.setVisible(false);
+
+				// Declare a File instance
+				File levelFile = new File("levels/level1.txt");
+
+				// Declare a Scanner for the file
+				Scanner input = null;
+				try {
+					input = new Scanner(levelFile);
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
 				}
-			}
 
-			// After creating the game board, set the mouse click event
+				// An ArrayList for already added cells (row, column) and clear the grid pane
+				ArrayList<String> addedCells = new ArrayList<String>();
+				centerPane.getChildren().clear();
+
+				while (input.hasNext()) {
+					// Get the next line -> Get row and column indexes from the line -> Add the
+					// indexes to the arraylist
+					String boxType = input.next();
+					int rowIndex = (int) boxType.charAt(boxType.length() - 3) - '0';
+					int columnIndex = (int) boxType.charAt(boxType.length() - 1) - '0';
+					addedCells.add(rowIndex + "," + columnIndex);
+
+					// Add boxes to centerPane according to the box type
+					if (boxType.substring(0, 4).equals("Wood")) // if it's wood box type
+						centerPane.add(setupImage(imageWood), columnIndex, rowIndex);
+					else if (boxType.substring(0, 5).equals("Empty")) // if it's empty box type
+						centerPane.add(setupImage(imageEmpty), columnIndex, rowIndex);
+					else if (boxType.substring(0, 6).equals("Mirror")) // if it's mirror box type
+						centerPane.add(setupImage(imageMirror), columnIndex, rowIndex);
+				}
+
+				// Close the Scanner
+				input.close();
+
+				// Fill the remaining boxes with the wall type box
+				for (int i = 0; i < 10; i++) {
+					for (int j = 0; j < 10; j++) {
+						if (!addedCells.contains(i + "," + j))
+							centerPane.add(setupImage(imageWall), j, i);
+					}
+				}
+				primaryStage.setScene(gameScene);
+			});
+
+			// Mouse click event for game board
 			centerPane.setOnMouseClicked(e -> {
 				for (Node box : centerPane.getChildren()) {
 					// Control the box for specific properties
@@ -112,12 +211,19 @@ public class Main extends Application {
 						int i = GridPane.getRowIndex(box);
 						int j = GridPane.getColumnIndex(box);
 
+						// Set the clicked box fade animation
+						FadeTransition boxReinitializeFade = new FadeTransition();
+						boxReinitializeFade.setFromValue(0.1);
+						boxReinitializeFade.setToValue(10);
+						boxReinitializeFade.setNode(box);
+
 						// Destroy the clicked box
 						if (boxType == "Mirror")
 							((ImageView) box).setImage(imageEmpty);
 						else if (boxType == "Wood")
 							((ImageView) box).setImage(imageMirror);
 						int destroyedBoxCount = 1;
+						boxReinitializeFade.play();
 
 						// Set the action text for clicked box
 						String actionText = "Box: " + i + "-" + j;
@@ -128,6 +234,12 @@ public class Main extends Application {
 							int rowIndex = GridPane.getRowIndex(aroundBox);
 							int colIndex = GridPane.getColumnIndex(aroundBox);
 							String aroundBoxType = getBoxType(aroundBox);
+
+							// Set the around box fade animation
+							FadeTransition aroundBoxReinitializeFade = new FadeTransition();
+							aroundBoxReinitializeFade.setFromValue(0.1);
+							aroundBoxReinitializeFade.setToValue(10);
+							aroundBoxReinitializeFade.setNode(aroundBox);
 
 							// Validate the location of the aroundBox
 							boolean topBoxCheck = rowIndex == i - 1 && colIndex == j;
@@ -145,6 +257,7 @@ public class Main extends Application {
 								else if (aroundBoxType == "Wood")
 									((ImageView) aroundBox).setImage(imageMirror);
 								destroyedBoxCount++;
+								aroundBoxReinitializeFade.play();
 
 								// Set the action text for destroyed neighboring box
 								actionText += " - " + "Hit: " + rowIndex + "," + colIndex;
@@ -171,28 +284,80 @@ public class Main extends Application {
 						// Show the action text after click event
 						action.setText("" + actionText);
 
+						// Check if the level is finished or not
+						boolean isFinished = true;
+						for (Node allBoxes : centerPane.getChildren()) {
+							String allBoxesType = getBoxType(allBoxes);
+
+							if (allBoxesType == "Mirror" || allBoxesType == "Wood") {
+								isFinished = false;
+								break;
+							}
+						}
+
+						if (isFinished == true && Integer.parseInt(level.getText().charAt(7) + "") != 5)
+							nextLevel.setVisible(true);
+
 						break;
 					}
 				}
 			});
 
-			// Add bottom labels to the bottomPane
-			bottomPane.setLeft(action);
-			bottomPane.setRight(nextLevel);
+			// Mouse click event for 'Next Level >>' label
+			nextLevel.setOnMouseClicked(e -> {
+				// Take the next level by increasing the level number on the level label
+				int nextLevelNumber = 1 + Integer.parseInt(level.getText().charAt(7) + "");
 
-			// Set the parts of the main pane
-			pane.setTop(topPane);
-			pane.setCenter(centerPane);
-			pane.setBottom(bottomPane);
+				// Edit label infos
+				level.setText("Level #" + nextLevelNumber);
+				score.setText("0");
+				highScore.setText("High Score: 0");
+				action.setText("---Text---");
+				nextLevel.setVisible(false);
 
-			// Set the scene
-			Scene scene = new Scene(pane, 400, 450);
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+				// Declare a File instance
+				File nextLevelFile = new File("levels/level" + nextLevelNumber + ".txt");
 
-			// Set the stage
-			primaryStage.setTitle("Game BOX");
-			primaryStage.setScene(scene);
-			primaryStage.show();
+				// Declare a Scanner for the file
+				Scanner nextInput = null;
+				try {
+					nextInput = new Scanner(nextLevelFile);
+				} catch (FileNotFoundException e1) {
+					e1.printStackTrace();
+				}
+
+				// An ArrayList for already added cells (row, column) and clear the grid pane
+				ArrayList<String> addedCells = new ArrayList<String>();
+				centerPane.getChildren().clear();
+
+				while (nextInput.hasNext()) {
+					// Get the next line -> Get row and column indexes from the line -> Add the
+					// indexes to the arraylist
+					String boxType = nextInput.next();
+					int rowIndex = (int) boxType.charAt(boxType.length() - 3) - '0';
+					int columnIndex = (int) boxType.charAt(boxType.length() - 1) - '0';
+					addedCells.add(rowIndex + "," + columnIndex);
+
+					// Add boxes to centerPane according to the box type
+					if (boxType.substring(0, 4).equals("Wood")) // if it's wood box type
+						centerPane.add(setupImage(imageWood), columnIndex, rowIndex);
+					else if (boxType.substring(0, 5).equals("Empty")) // if it's empty box type
+						centerPane.add(setupImage(imageEmpty), columnIndex, rowIndex);
+					else if (boxType.substring(0, 6).equals("Mirror")) // if it's mirror box type
+						centerPane.add(setupImage(imageMirror), columnIndex, rowIndex);
+				}
+
+				// Close the Scanner
+				nextInput.close();
+
+				// Fill the remaining boxes with the wall type box
+				for (int i = 0; i < 10; i++) {
+					for (int j = 0; j < 10; j++) {
+						if (!addedCells.contains(i + "," + j))
+							centerPane.add(setupImage(imageWall), j, i);
+					}
+				}
+			});
 
 		} catch (Exception e) {
 			e.printStackTrace();
