@@ -38,19 +38,31 @@ public class Main extends Application {
 	public void start(Stage primaryStage) {
 		try {
 
-			// Declare panes
+			// Create main panes
 			BorderPane menuPane = new BorderPane();
 			BorderPane gamePane = new BorderPane();
+			BorderPane highScorePane = new BorderPane();
+
+			// Create game pane parts
 			BorderPane topPane = new BorderPane();
 			GridPane centerPane = new GridPane();
 			BorderPane bottomPane = new BorderPane();
 
+			// Create high scores pane part
+			GridPane highScoreTable = new GridPane();
+
 			// Set pane styles
+			menuPane.setStyle("-fx-background-image: url('images/background.jpg'); -fx-background-size: 400 450;");
+
 			topPane.setPadding(new Insets(1, 5, 1, 5));
 			centerPane.setStyle("-fx-background-color: gray;");
 			centerPane.setAlignment(Pos.CENTER);
 			bottomPane.setPadding(new Insets(1, 5, 1, 5));
-			menuPane.setStyle("-fx-background-image: url('images/menu_background.jpg'); -fx-background-size: 400 450;");
+
+			highScoreTable.setAlignment(Pos.CENTER);
+			highScoreTable.setHgap(30);
+			highScoreTable.setVgap(10);
+			highScorePane.setStyle("-fx-background-image: url('images/background.jpg'); -fx-background-size: 400 450;");
 
 			// Create menu labels
 			Label gameBox = new Label("GAME BOX");
@@ -59,25 +71,35 @@ public class Main extends Application {
 			Label menuHighScores = new Label("High Scores");
 			Label infoText = new Label("(You can click the 'M' button to return the menu)");
 
-			// Set menu label styles
-			Font menuLabelFont = Font.font("Times New Roman", FontWeight.BOLD, 20);
+			// Create high score header label
+			Label highScoresHeader = new Label("High Scores");
+
+			// Set menu and high score label styles
+			Font labelFont = Font.font("Times New Roman", FontWeight.BOLD, 20);
+			Font headerLabelFont = Font.font("Times New Roman", FontWeight.BOLD, 30);
 			Stop[] stops = new Stop[] { new Stop(0, Color.rgb(251, 118, 237, 1)),
 					new Stop(1, Color.rgb(79, 191, 230, 1)) };
 			LinearGradient linear = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE, stops);
 
-			gameBox.setFont(Font.font("Times New Roman", FontWeight.BOLD, 30));
-			newGame.setFont(menuLabelFont);
-			resumeGame.setFont(menuLabelFont);
-			menuHighScores.setFont(menuLabelFont);
+			// Set fonts
+			gameBox.setFont(headerLabelFont);
+			highScoresHeader.setFont(headerLabelFont);
+			newGame.setFont(labelFont);
+			resumeGame.setFont(labelFont);
+			menuHighScores.setFont(labelFont);
+
+			// Add linear gradient
 			gameBox.setTextFill(linear);
 			newGame.setTextFill(linear);
 			resumeGame.setTextFill(linear);
 			menuHighScores.setTextFill(linear);
 			infoText.setTextFill(linear);
+			highScoresHeader.setTextFill(linear);
 
-			// Add the menu labels to a centered vertical box
+			// Add the menu labels to centered vertical boxes
 			VBox menuLabelBox = new VBox();
 			VBox clickableLabelBox = new VBox();
+
 			menuLabelBox.setAlignment(Pos.CENTER);
 			menuLabelBox.setSpacing(40);
 			clickableLabelBox.setAlignment(Pos.CENTER);
@@ -89,12 +111,22 @@ public class Main extends Application {
 			// Add menu labels to the menu pane
 			menuPane.setCenter(menuLabelBox);
 
-			// Declare top labels
+			// Add the high score labels to a centered vertical box
+			VBox highScoreLabelBox = new VBox();
+			highScoreLabelBox.setAlignment(Pos.CENTER);
+			highScoreLabelBox.setSpacing(20);
+
+			highScoreLabelBox.getChildren().addAll(highScoresHeader, highScoreTable);
+
+			// Add high score labels to the highScorePane
+			highScorePane.setCenter(highScoreLabelBox);
+
+			// Create top labels of game scene
 			Label level = new Label("Level #1");
 			Label score = new Label("0");
 			Label highScore = new Label("High Score: 0");
 
-			// Declare bottom labels
+			// Create bottom labels of game scene
 			Label action = new Label("---Text---");
 			Label nextLevel = new Label("Next Level >>");
 			nextLevel.setVisible(false);
@@ -104,32 +136,30 @@ public class Main extends Application {
 			topPane.setCenter(score);
 			topPane.setRight(highScore);
 
-			// Declare the box images
-			Image imageWall = new Image("boxes/Wall Type Box.png");
-			Image imageEmpty = new Image("boxes/Empty Type Box.png");
-			Image imageMirror = new Image("boxes/Mirror Type Box.png");
-			Image imageWood = new Image("boxes/Wood Type Box.png");
-
-			// Add bottom labels to the bottomPane
+			// Set bottom labels to the bottomPane
 			bottomPane.setLeft(action);
 			bottomPane.setRight(nextLevel);
 
-			// Set the parts of the main pane
+			// Set the parts of the game pane
 			gamePane.setTop(topPane);
 			gamePane.setCenter(centerPane);
 			gamePane.setBottom(bottomPane);
 
 			// Set the scenes
 			Scene menuScene = new Scene(menuPane, 400, 450);
-			menuScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
-
 			Scene gameScene = new Scene(gamePane, 400, 450);
-			menuScene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			Scene highScoreScene = new Scene(highScorePane, 400, 450);
 
 			// Set the stage
 			primaryStage.setTitle("Game BOX");
 			primaryStage.setScene(menuScene);
 			primaryStage.show();
+
+			// Declare the box images
+			Image imageWall = new Image("boxes/Wall Type Box.png");
+			Image imageEmpty = new Image("boxes/Empty Type Box.png");
+			Image imageMirror = new Image("boxes/Mirror Type Box.png");
+			Image imageWood = new Image("boxes/Wood Type Box.png");
 
 			// Set the mouse click event for resume game label
 			resumeGame.setOnMouseClicked(e -> {
@@ -137,10 +167,21 @@ public class Main extends Application {
 					primaryStage.setScene(gameScene);
 			});
 
-			// Set the key pressed event for 'M' button to return the menu
+			// Set the key pressed event for 'M' button to return the menu on game board
 			gameScene.setOnKeyPressed(e -> {
 				if (e.getCode() == KeyCode.M)
 					primaryStage.setScene(menuScene);
+			});
+
+			// Set the key pressed event for 'M' button to return the menu on highScoreScene
+			highScoreScene.setOnKeyPressed(e -> {
+				if (e.getCode() == KeyCode.M)
+					primaryStage.setScene(menuScene);
+			});
+
+			// Set the mouse click event for high scores label on menu
+			menuHighScores.setOnMouseClicked(e -> {
+				primaryStage.setScene(highScoreScene);
 			});
 
 			// Mouse click event for 'New Game' label
@@ -151,6 +192,9 @@ public class Main extends Application {
 				highScore.setText("High Score: 0");
 				action.setText("---Text---");
 				nextLevel.setVisible(false);
+
+				// Clear the high score table
+				highScoreTable.getChildren().clear();
 
 				// Declare a File instance
 				File levelFile = new File("levels/level1.txt");
@@ -295,8 +339,29 @@ public class Main extends Application {
 							}
 						}
 
-						if (isFinished == true && Integer.parseInt(level.getText().charAt(7) + "") != 5)
-							nextLevel.setVisible(true);
+						int currentLevel = Integer.parseInt(level.getText().charAt(7) + "");
+						if (isFinished == true) {
+							// Before showing the next level label, set the high score to the highScorePane
+							Label levelLabel = new Label("Level " + currentLevel);
+							Label highScoreOfLevel = new Label("" + Integer.valueOf(highScore.getText().substring(12)));
+
+							Font highScoreLabelFont = Font.font("Times New Roman", FontWeight.BOLD, 20);
+							Stop[] highScoreStops = new Stop[] { new Stop(0, Color.rgb(251, 118, 237, 1)),
+									new Stop(1, Color.rgb(79, 191, 230, 1)) };
+							LinearGradient highScoreLinear = new LinearGradient(0, 0, 1, 0, true, CycleMethod.NO_CYCLE,
+									highScoreStops);
+
+							levelLabel.setFont(highScoreLabelFont);
+							highScoreOfLevel.setFont(highScoreLabelFont);
+							levelLabel.setTextFill(highScoreLinear);
+							highScoreOfLevel.setTextFill(highScoreLinear);
+
+							highScoreTable.add(levelLabel, 0, currentLevel);
+							highScoreTable.add(highScoreOfLevel, 1, currentLevel);
+
+							if (currentLevel != 5)
+								nextLevel.setVisible(true);
+						}
 
 						break;
 					}
