@@ -22,20 +22,14 @@ Firstly, we aimed to develop a simple board game named “Game Box”. In this g
 
 <br/><h4>IMPLEMENTATION DETAILS</h4>
 
-Provide the UML diagrams of your project. In this section, you should also describe how you design and implement the project in more detail.
-
-a) Additionally, you may provide information about:
-
-i) which parts are complete/incomplete in your project?
-
-ii) what are the difficulties you have encountered during the implementation?
-
-iii) what are the additional functionalities of your project added by your team?
-
-// TODO
+In our project, we didn’t prepare any external class. We wrote our code in the main class that extends application. In the main class, we used border and grid panes. We filled them with labels, vertical boxes and images. Speaking of images, we filled the game boxes with images. In addition, we placed our click events at the bottom of the main class. Before that code blocks, we have three different scenes. These are for menu (main screen), game and high scores screens. We tried to make the design of the other screens as cool as we could, except the game screen. We prepared the game screen as in the term project document. In the code, almost every code block has a comment at the top of it for explaining what we aim to do. In this way, most people looking at the code will easily understand what we are trying to do.
+  
+In our program, all the features mentioned in the term project document are completed. We also added new features like animation when boxes destroyed, new scenes for the user interface and high scores screen , ‘New Game’ and ‘Resume Game’ buttons.
+  
+When we come to the challenges of the project, we did not encounter any specific difficulty during the implementation. We solved the problems by communicating with each other and thinking about the issues.
+  
+We had enough fun while developing the game, we hope you have fun trying our game :)
 
 <br/><h4>TEST CASES</h4>
-
-This section should contain the results of your testing phase. You should provide the screenshots of your project execution for the given test cases and add explanations about them. Filling this part only with screenshots is not a feasible solution.
 
 // TODO
