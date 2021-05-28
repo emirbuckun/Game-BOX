@@ -29,7 +29,3 @@ In our program, all the features mentioned in the term project document are comp
 When we come to the challenges of the project, we did not encounter any specific difficulty during the implementation. We solved the problems by communicating with each other and thinking about the issues.
   
 We had enough fun while developing the game, we hope you have fun trying our game :)
-
-<br/><h4>TEST CASES</h4>
-
-// TODO
